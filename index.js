@@ -30,7 +30,12 @@ app.get("/data/usage", (req, res) => {
   const tempLevels = cleanData.map(item => {
     return {
       id: item.id,
-      heatLevel: item.tempIn - item.tempOut
+      heatLevel:
+        item.tempIn - item.tempOut > 40
+          ? "high"
+          : item.tempIn - item.tempOut < 35
+            ? "low "
+            : "medium"
     };
   });
 
