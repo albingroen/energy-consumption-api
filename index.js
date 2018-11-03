@@ -28,9 +28,9 @@ function getUsageSum(total, num) {
 }
 
 function avgLevel(avg) {
-  if (avg > 40) {
+  if (avg > 42) {
     return "high";
-  } else if (avg < 35) {
+  } else if (avg < 38) {
     return "low";
   } else {
     return "medium";
@@ -105,7 +105,7 @@ app.get("/:building/levels", async (req, res) => {
             item.tempIn - item.tempOut > 40
               ? "high"
               : item.tempIn - item.tempOut < 35
-                ? "low "
+                ? "low"
                 : "medium"
         };
       }
@@ -120,7 +120,7 @@ app.get("/:building/levels", async (req, res) => {
           item.tempIn - item.tempOut > 40
             ? "high"
             : item.tempIn - item.tempOut < 35
-              ? "low "
+              ? "low"
               : "medium"
       };
     });
