@@ -33,7 +33,17 @@ function getUsageSum(total, num) {
   return total + num;
 }
 
-const port = process.env.port || 5000;
+function avgLevel(avg) {
+  if (avg > 40) {
+    return "high";
+  } else if (avg < 35) {
+    return "low";
+  } else {
+    return "medium";
+  }
+}
+
+const port = 8080;
 const dataRoute =
   "https://04m8q6i6g2.execute-api.eu-central-1.amazonaws.com/dev/ekberga/2016/1";
 
@@ -52,7 +62,9 @@ app.get("/:building/levels", (req, res) => {
 app.get("/:building/avg", (req, res) => {
   const usages = cleanData.map(item => item.tempIn - item.tempOut);
 
-  res.send({ avg: usages.reduce(getUsageSum) / usages.length });
+  res.send({
+    avg: avgLevel(usages.reduce(getUsageSum) / usages.length)
+  });
 });
 
 app.listen(port, () => {
