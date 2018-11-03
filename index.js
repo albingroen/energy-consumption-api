@@ -6,7 +6,7 @@ const cors = require("cors");
 
 app.use(cors());
 
-const useRealData = false;
+const useRealData = true;
 
 const staticCleanData = staticData.map(item => {
   return {
@@ -16,18 +16,6 @@ const staticCleanData = staticData.map(item => {
     tempIn: item.tframledFVebSkolan,
     pressureOut: item.pReturFVebSkolan,
     tempOut: item.tReturFVebSkolan
-  };
-});
-
-const tempLevels = staticCleanData.map(item => {
-  return {
-    id: item.id,
-    heatLevel:
-      item.tempIn - item.tempOut > 40
-        ? "high"
-        : item.tempIn - item.tempOut < 35
-          ? "low "
-          : "medium"
   };
 });
 
@@ -99,15 +87,63 @@ app.get("/:building", async (req, res) => {
   }
 });
 
-app.get("/:building/levels", (req, res) => {
-  res.send(tempLevels);
+app.get("/:building/levels", async (req, res) => {
+  const { building } = req.params;
+
+  if (useRealData) {
+    const buildingData = await axios.get(dataRoute(building));
+
+    const consumptionLevel = renderBuildingData(buildingData, building).map(
+      item => {
+        return {
+          id: item.id,
+          consumptionLevel:
+            item.tempIn - item.tempOut > 40
+              ? "high"
+              : item.tempIn - item.tempOut < 35
+                ? "low "
+                : "medium"
+        };
+      }
+    );
+
+    res.send(consumptionLevel);
+  } else {
+    const staticConsumptionLevel = staticCleanData.map(item => {
+      return {
+        id: item.id,
+        consumptionLevel:
+          item.tempIn - item.tempOut > 40
+            ? "high"
+            : item.tempIn - item.tempOut < 35
+              ? "low "
+              : "medium"
+      };
+    });
+
+    res.send(staticConsumptionLevel);
+  }
 });
 
-app.get("/:building/avg", (req, res) => {
-  const usages = staticCleanData.map(item => item.tempIn - item.tempOut);
+app.get("/:building/avg", async (req, res) => {
+  const { building } = req.params;
+
+  const staticConsumptions = staticCleanData.map(
+    item => item.tempIn - item.tempOut
+  );
+
+  const buildingData = await axios.get(dataRoute(building));
+
+  const consumptions = buildingData.data.rows.map(
+    item => item.tempIn - item.tempOut
+  );
 
   res.send({
-    avg: avgLevel(usages.reduce(getUsageSum) / usages.length)
+    avg: useRealData
+      ? avgLevel(consumptions.reduce(getUsageSum) / consumptions.length)
+      : avgLevel(
+          staticConsumptions.reduce(getUsageSum) / staticConsumptions.length
+        )
   });
 });
 
