@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const axios = require("axios");
 const staticData = require("./staticData");
+const cors = require("cors");
+
+app.use(cors());
 
 const cleanData = staticData.map(item => {
   return {
@@ -22,15 +25,20 @@ app.get("/", (req, res) => {
   res.send("Welcome to the server");
 });
 
-app.get("/data", async (req, res) => {
+app.get("/:building", (req, res) => {
   res.send(cleanData);
 });
 
-app.get("/data/usage", (req, res) => {
+app.get("/:building/levels", (req, res) => {
   const tempLevels = cleanData.map(item => {
     return {
       id: item.id,
-      heatLevel: item.tempIn - item.tempOut
+      heatLevel:
+        item.tempIn - item.tempOut > 40
+          ? "high"
+          : item.tempIn - item.tempOut < 35
+            ? "low "
+            : "medium"
     };
   });
 

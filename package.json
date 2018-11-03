@@ -20,6 +20,7 @@
   "homepage": "https://github.com/albingroen/north-hack-project#readme",
   "dependencies": {
     "axios": "^0.18.0",
+    "cors": "^2.8.4",
     "express": "^4.16.4",
     "nodemon": "^1.18.5"
   }
