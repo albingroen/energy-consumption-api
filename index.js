@@ -85,7 +85,7 @@ app.get("/:building", async (req, res) => {
   if (useRealData) {
     const buildingData = await axios.get(dataRoute(building));
 
-    res.send(renderBuildingData(buildingData, building));
+    res.send(renderBuildingData(buildingData, building).splice(0, 100));
   } else {
     res.send(staticCleanData);
   }
