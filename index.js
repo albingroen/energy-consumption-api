@@ -17,6 +17,22 @@ const cleanData = staticData.map(item => {
   };
 });
 
+const tempLevels = cleanData.map(item => {
+  return {
+    id: item.id,
+    heatLevel:
+      item.tempIn - item.tempOut > 40
+        ? "high"
+        : item.tempIn - item.tempOut < 35
+          ? "low "
+          : "medium"
+  };
+});
+
+function getUsageSum(total, num) {
+  return total + num;
+}
+
 const port = process.env.port || 5000;
 const dataRoute =
   "https://04m8q6i6g2.execute-api.eu-central-1.amazonaws.com/dev/ekberga/2016/1";
@@ -30,19 +46,13 @@ app.get("/:building", (req, res) => {
 });
 
 app.get("/:building/levels", (req, res) => {
-  const tempLevels = cleanData.map(item => {
-    return {
-      id: item.id,
-      heatLevel:
-        item.tempIn - item.tempOut > 40
-          ? "high"
-          : item.tempIn - item.tempOut < 35
-            ? "low "
-            : "medium"
-    };
-  });
-
   res.send(tempLevels);
+});
+
+app.get("/:building/avg", (req, res) => {
+  const usages = cleanData.map(item => item.tempIn - item.tempOut);
+
+  res.send({ avg: usages.reduce(getUsageSum) / usages.length });
 });
 
 app.listen(port, () => {
