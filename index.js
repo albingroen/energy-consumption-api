@@ -14,7 +14,7 @@ const cleanData = staticData.map(item => {
   };
 });
 
-const port = process.env.port || 5000;
+const port = 8080; 
 const dataRoute =
   "https://04m8q6i6g2.execute-api.eu-central-1.amazonaws.com/dev/ekberga/2016/1";
 
