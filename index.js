@@ -19,6 +19,10 @@ const staticCleanData = staticData.map(item => {
   };
 });
 
+const staticConsumptions = staticCleanData.map(
+  item => item.tempIn - item.tempOut
+);
+
 function getUsageSum(total, num) {
   return total + num;
 }
@@ -128,10 +132,6 @@ app.get("/:building/levels", async (req, res) => {
 app.get("/:building/avg", async (req, res) => {
   const { building } = req.params;
 
-  const staticConsumptions = staticCleanData.map(
-    item => item.tempIn - item.tempOut
-  );
-
   const buildingData = await axios.get(dataRoute(building));
 
   const consumptions = buildingData.data.rows.map(
@@ -144,6 +144,22 @@ app.get("/:building/avg", async (req, res) => {
       : avgLevel(
           staticConsumptions.reduce(getUsageSum) / staticConsumptions.length
         )
+  });
+});
+
+app.get("/:building/avgPure", async (req, res) => {
+  const { building } = req.params;
+
+  const buildingData = await axios.get(dataRoute(building));
+
+  const consumptions = buildingData.data.rows.map(
+    item => item.tempIn - item.tempOut
+  );
+
+  res.send({
+    avg: useRealData
+      ? consumptions.reduce(getUsageSum) / consumptions.length
+      : staticConsumptions.reduce(getUsageSum) / staticConsumptions.length
   });
 });
 
